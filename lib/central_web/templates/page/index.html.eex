@@ -1,0 +1,26 @@
+<section class="phx-hero" hidden>
+  <h1>Totens</h1>
+  <p>A prodctive web framework that<br/>does not compromise speed or maintainability.</p>
+</section>
+
+<template id="toten-template">
+    <div class="toten">
+        <h1></h1>
+        <small></small>
+
+        <div>
+           <button class="change-font">Change font color</button>
+           <input type="color" class="input-font">
+        </div>
+        <div>
+           <button class="change-background">Change background color</button>
+           <input type="color" class="input-background">
+        </div>
+        <div>
+           <button class="turn-off">Turn off</button>
+        </div>
+    </div>
+</template>
+
+<section class="row" id="app">
+</section>
