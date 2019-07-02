@@ -1,4 +1,3 @@
-import css from '../css/app.css'
 import 'phoenix_html'
 import socket from './socket'
 
@@ -6,8 +5,6 @@ class Toten {
     constructor(name) {
         this.id = '_' + Math.random().toString(36).substr(2, 9);
         this.name = name;
-        this.fontColor = '#333333';
-        this.backgroundColor = '#cccccc';
     }
 };
 
@@ -18,8 +15,6 @@ const model = {
 
 const ReceiveTotens = 'receive-totens';
 const SendCommand = 'send-command';
-const UpdateFontColor = 'update-font-color';
-const UpdateBackgroundColor = 'update-background-color';
 
 const update = (action, data, model) => {
     switch (action) {
@@ -30,16 +25,13 @@ const update = (action, data, model) => {
             });
             return model;
 
-        case UpdateFontColor:
-            model.totens[model.totens.findIndex(t => t.id === data[0].id)].fontColor = data[1];
-            return model;
-
-        case UpdateBackgroundColor:
-            model.totens[model.totens.findIndex(t => t.id === data[0].id)].backgroundColor = data[1];
-            return model;
-
         case SendCommand:
-            console.log('Send command', data);
+            data.channel.push('new_command', {
+                toten: data.toten,
+                command: data.command,
+                arg: data.arg
+            });
+
             return model;
 
         default: return model;
@@ -52,31 +44,46 @@ const empty = node => {
     }
 };
 
-const totenEl = (signal, model, toten) => {
+const colorPalette = (signal, toten, channel, area) => {
+    const colors = [
+        'hsl(0, 0%, 100%)',
+        'hsl(0, 0%, 96%)',
+        'hsl(0, 0%, 21%)',
+        'hsl(0, 0%, 4%)',
+        'hsl(171, 100%, 41%)',
+        'hsl(217, 71%, 53%)',
+        'hsl(204, 86%, 53%)',
+        'hsl(141, 71%, 48%)',
+        'hsl(48, 100%, 67%)',
+        'hsl(348, 100%, 61%)'
+    ];
+    
+    const el = document.createElement('div');
+
+    colors.forEach(color => {
+        const button = document.createElement('button');
+        button.style.backgroundColor = color;
+        button.classList.add('button');
+        button.onclick = signal(SendCommand, { channel, toten: toten.name, command: `change_${area}_color`, arg: color });
+
+        el.appendChild(button);
+    });
+
+    return el;
+}
+
+const totenEl = (signal, model, channel, toten) => {
     const el = document.createElement('div');
     const template = document.getElementById('toten-template');
 
     el.innerHTML = template.innerHTML;
-    el.querySelector('h1').innerText = `Toten: ${toten.name}`;
-    el.querySelector('small').innerText = `Id: ${toten.id}`;
+    el.querySelector('.toten-name').innerText = `Toten: ${toten.name}`;
+    el.querySelector('.toten-id').innerText = `${toten.id}`;
 
-    const fontInput = el.querySelector('input.input-font');
-    fontInput.value = toten.fontColor;
-    fontInput.onchange = () => {
-        signal(UpdateFontColor, [toten, fontInput.value])();
-        signal(SendCommand, ['new-font-color', fontInput.value])();
-    };
+    el.querySelector('.font-colors').appendChild(colorPalette(signal, toten, channel, 'font'));
+    el.querySelector('.background-colors').appendChild(colorPalette(signal, toten, channel, 'background'));
 
-    const backgroundInput = el.querySelector('input.input-background');
-    backgroundInput.value = toten.backgroundColor;
-    backgroundInput.onchange = (e) => {
-        signal(UpdateBackgroundColor, [toten, backgroundInput.value])();
-        signal(SendCommand, ['new-background-color', backgroundInput.value])();
-    };
-
-    el.querySelector('button.change-background').onclick = () => { backgroundInput.click(); };
-    el.querySelector('button.change-font').onclick = () => { fontInput.click(); };
-    el.querySelector('button.turn-off').onclick = signal(SendCommand, ['turn-off', '']);
+    el.querySelector('button.turn-off').onclick = signal(SendCommand, { channel, toten: toten.name, command: 'turn-off', arg: '' });
 
     return el;
 };
@@ -91,12 +98,12 @@ const nothingHereEl = () => {
     return el;
 };
 
-const view = (signal, model, root) => {
+const view = (signal, model, channel, root) => {
     empty(root);
 
     const elements =
         model.totens.length ?
-            model.totens.map(toten => totenEl(signal, model, toten)) :
+            model.totens.map(toten => totenEl(signal, model, channel, toten)) :
             [ nothingHereEl() ];
 
     elements.forEach(element => { root.appendChild(element); });
@@ -109,23 +116,26 @@ const connect = (signal, model) => {
         .join()
         .receive('ok', _ => { console.log(`Connected to socket at ${Date.now()}`) });
 
-    channel.on('totens', data => {
-        signal(ReceiveTotens, 'totens' in data ? data.totens : [])();
-    });
-
     return channel;
 };
 
 const mount = (model, update, view, root_element) => {
+    const channel = connect(signal, model);
+
     const signal = (action, data) => {
         return () => {
             model = update(action, data, model);
-            view(signal, model, root_element);
+            view(signal, model, channel, root_element);
         };
     };
 
-    view(signal, model, root_element);
-    connect(signal, model);
+    // init
+
+    channel.on('totens', data => {
+        signal(ReceiveTotens, 'totens' in data ? data.totens : [])();
+    });
+
+    view(signal, model, channel, root_element);
 };
 
 mount(model, update, view, document.getElementById('app'));

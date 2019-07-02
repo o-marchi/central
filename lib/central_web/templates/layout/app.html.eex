@@ -5,13 +5,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Central</title>
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css"/>
+
+    <style>
+      html, body {
+          background: #e5e5e5;
+          height: 100%;
+      }
+
+      .box {
+        margin-bottom: 20px;
+      }
+
+      .toten-name {
+        font-size: 18px;
+        margin-right: 20px;
+      }
+      
+
+      .toten-id {
+        color: #999;
+      }
+
+      .button {
+          height: 26px;
+          line-height: 26px;
+          padding: 0 12px;
+          font-size: 14px;
+      }
+
+      .media {
+          margin-bottom: 20px;
+      }
+
+      .column p {
+          font-size: 14px;
+          margin-bottom: 10px;
+      }
+
+      .column button {
+          margin-right: 6px;
+      }
+    </style>
+
   </head>
   <body>
-    <header>
-      <section class="container">
-      </section>
-    </header>
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            Totens
+          </h1>
+        </div>
+      </div>
+    </section>
 
     <main role="main" class="container">
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>

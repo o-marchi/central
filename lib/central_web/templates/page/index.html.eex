@@ -1,26 +1,30 @@
-<section class="phx-hero" hidden>
-  <h1>Totens</h1>
-  <p>A prodctive web framework that<br/>does not compromise speed or maintainability.</p>
-</section>
-
 <template id="toten-template">
-    <div class="toten">
-        <h1></h1>
-        <small></small>
+   <div class="box">
+      <article class="media">
+         <div class="media-content">
+            <div class="content">
+               <p>
+                  <strong class="toten-name"></strong>
+                  <small class="toten-id is-italic"></small>
+               </p>
+            </div>
+         </div>
+      </article>
 
-        <div>
-           <button class="change-font">Change font color</button>
-           <input type="color" class="input-font">
-        </div>
-        <div>
-           <button class="change-background">Change background color</button>
-           <input type="color" class="input-background">
-        </div>
-        <div>
-           <button class="turn-off">Turn off</button>
-        </div>
-    </div>
+      <div class="columns">
+         <div class="column font-colors">
+            <p>Change font color:</p>
+         </div>
+         <div class="column background-colors">
+            <p>Change background color:</p>
+         </div>
+         <div class="column">
+            <p>Turn off toten:</p>
+            <button class="turn-off button is-danger">Turn off</button>
+         </div>
+      </div>
+   </div>
 </template>
 
-<section class="row" id="app">
+<section id="app">
 </section>
