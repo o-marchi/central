@@ -18,10 +18,6 @@
          <div class="column background-colors">
             <p>Change background color:</p>
          </div>
-         <div class="column">
-            <p>Turn off toten:</p>
-            <button class="turn-off button is-danger">Turn off</button>
-         </div>
       </div>
    </div>
 </template>
